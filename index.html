@@ -11,6 +11,10 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+        button, a, label, [role="button"] {
+            touch-action: manipulation; /* kill 300ms tap delay on iOS/Android */
+        }
+
         :root {
             --teal: #1aab8a;
             --teal-dark: #148f72;
@@ -285,16 +289,19 @@
 
         .mobile-menu .mm-quote {
             background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
+            border: none;
             border-radius: 10px;
             padding: 15px;
-            justify-content: center;
+            width: 100%;
+            text-align: center;
             color: white;
+            font-size: 18px;
+            font-family: 'Inter', sans-serif;
             font-weight: 700;
-            border-bottom: none;
+            cursor: pointer;
             margin-top: 10px;
+            display: block;
         }
-
-        .mobile-menu .mm-quote::after { display: none; }
 
         /* shimmer-capable button base */
         .btn-teal, .btn-hero-primary, .btn-cta-main, .submit-btn {
@@ -1343,9 +1350,8 @@
         .modal-bg {
             position: fixed;
             inset: 0;
+            /* NO backdrop-filter here — iOS intercepts touch events on blurred overlays */
             background: rgba(2,6,15,0.82);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -1354,6 +1360,8 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            /* ensure taps on the overlay itself close the modal */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .modal-bg.open {
@@ -1361,17 +1369,10 @@
             pointer-events: all;
         }
 
-        /* no-JS fallback: anchor links (#quoteModal) open the modal via :target */
-        .modal-bg:target {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-bg:target .modal {
-            transform: translateY(0) scale(1);
-        }
-
         .modal {
+            /* backdrop-filter lives on the card only, not the overlay */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             background:
                 linear-gradient(var(--dark-2), var(--dark-2)) padding-box,
                 linear-gradient(160deg, rgba(26,171,138,0.45), rgba(255,255,255,0.08) 40%, rgba(26,171,138,0.2)) border-box;
@@ -1948,7 +1949,7 @@
                 <svg class="ic"><use href="#i-phone"/></svg>
                 (833) 378-7838
             </a>
-            <a class="btn-teal" href="#quoteModal" onclick="openQuote()">Get a Quote</a>
+            <button class="btn-teal" onclick="openQuote()">Get a Quote</button>
             <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
@@ -1966,7 +1967,7 @@
         <svg class="ic"><use href="#i-phone"/></svg>
         Call (833) 378-7838
     </a>
-    <a class="mm-quote" href="#quoteModal" onclick="closeMenu(); openQuote();">Get a Free Quote</a>
+    <button class="mm-quote" onclick="closeMenu(); openQuote();">Get a Free Quote</button>
 </div>
 
 <!-- ═══════════════════════════════ HERO ════════════════════════════════ -->
@@ -2016,9 +2017,9 @@
             Enterprise-grade logistics without the enterprise headache. Backed by ASSA Oil's established carrier network — competitive rates, real-time visibility, and a team that picks up the phone.
         </p>
         <div class="hero-actions">
-            <a class="btn-hero-primary" href="#quoteModal" onclick="openQuote()">
+            <button class="btn-hero-primary" onclick="openQuote()">
                 Get a Free Quote &nbsp;→
-            </a>
+            </button>
             <a class="btn-hero-ghost" href="#services">
                 Our Services
             </a>
@@ -2304,7 +2305,7 @@
                 <p>Get a competitive quote in under an hour. No commitments, no runaround — just straight answers and rates that make sense for your business.</p>
             </div>
             <div class="cta-right">
-                <a class="btn-cta-main" href="#quoteModal" onclick="openQuote()">Get a Free Quote →</a>
+                <button class="btn-cta-main" onclick="openQuote()">Get a Free Quote →</button>
                 <a href="tel:8333787838" class="btn-cta-phone">
                     <svg class="ic"><use href="#i-phone"/></svg>
                     (833) 378-7838
@@ -2347,7 +2348,7 @@
                 <h4>Get In Touch</h4>
                 <a href="tel:8333787838">(833) 378-7838</a>
                 <a href="mailto:sean@assaoil.com">sean@assaoil.com</a>
-                <a href="#quoteModal" onclick="openQuote()">Request a Quote</a>
+                <a href="javascript:void(0)" onclick="openQuote()">Request a Quote</a>
             </div>
         </div>
         <div class="foot-bottom">
@@ -2365,7 +2366,7 @@
                 <h2 id="modalTitle">Request a Freight Quote</h2>
                 <p>Fill out the form — we'll respond within 1 hour with competitive rates.</p>
             </div>
-            <a class="modal-close" href="#!" onclick="closeQuote()" aria-label="Close">✕</a>
+            <button class="modal-close" onclick="closeQuote()" aria-label="Close">✕</button>
         </div>
 
         <div id="formWrap">
@@ -2495,7 +2496,7 @@
             <p>
                 Thanks! Our freight team will review your details and get back to you <strong style="color:var(--teal)">within 1 hour</strong> with a competitive quote.
             </p>
-            <a class="btn-hero-primary" href="#!" onclick="closeQuote()">Close &nbsp;→</a>
+            <button class="btn-hero-primary" onclick="closeQuote()">Close &nbsp;→</button>
         </div>
     </div>
 </div>
@@ -2714,10 +2715,10 @@ const trackCard = document.getElementById('trackCard');
 if (trackCard) trackObs.observe(trackCard);
 
 // ── MODAL ─────────────────────────────────────────────────────────────────
-let modalOpenedAt = 0;
+let _modalTs = 0;
 
 function openQuote() {
-    modalOpenedAt = Date.now();
+    _modalTs = Date.now();
     document.getElementById('quoteModal').classList.add('open');
     document.body.style.overflow = 'hidden';
 }
@@ -2725,11 +2726,6 @@ function openQuote() {
 function closeQuote() {
     document.getElementById('quoteModal').classList.remove('open');
     document.body.style.overflow = '';
-    // clear the :target hash so the no-JS fallback doesn't hold it open
-    if (location.hash === '#quoteModal') {
-        history.replaceState(null, '', location.pathname + location.search);
-    }
-    // reset form after close
     setTimeout(() => {
         document.getElementById('formWrap').style.display = '';
         document.getElementById('successState').classList.remove('show');
@@ -2740,13 +2736,10 @@ function closeQuote() {
     }, 400);
 }
 
-// open if the page is loaded with #quoteModal already in the URL
-if (location.hash === '#quoteModal') openQuote();
-
+// tap on the dark overlay closes the modal;
+// 350ms guard prevents the opening tap from immediately closing it
 document.getElementById('quoteModal').addEventListener('click', e => {
-    // ignore the ghost tap that follows opening on touch devices,
-    // otherwise the same tap that opens the sheet instantly closes it
-    if (Date.now() - modalOpenedAt < 400) return;
+    if (Date.now() - _modalTs < 350) return;
     if (e.target === document.getElementById('quoteModal')) closeQuote();
 });
 
@@ -2755,10 +2748,6 @@ document.addEventListener('keydown', e => {
 });
 
 // ── FORM SUBMISSION ───────────────────────────────────────────────────────
-// To enable email sending, go to https://web3forms.com, enter
-// sean@assaoil.com to receive your access key, then paste it below.
-const WEB3FORMS_KEY = 'YOUR_WEB3FORMS_KEY';
-
 async function handleSubmit(e) {
     e.preventDefault();
 
@@ -2766,10 +2755,9 @@ async function handleSubmit(e) {
     const btn   = document.getElementById('submitBtn');
     const label = document.getElementById('btnLabel');
 
-    // Basic validation
-    const required = form.querySelectorAll('[required]');
+    // validation
     let valid = true;
-    required.forEach(field => {
+    form.querySelectorAll('[required]').forEach(field => {
         if (!field.value.trim()) {
             field.style.borderColor = '#ef4444';
             valid = false;
@@ -2783,64 +2771,46 @@ async function handleSubmit(e) {
 
     const fd = new FormData(form);
     const f  = Object.fromEntries(fd.entries());
-    const accessorials = fd.getAll('accessorials');
-
-    const emailBody = `
-NEW FREIGHT QUOTE REQUEST — ASSA SHIPPING
-==========================================
-
-CONTACT
-  Name:        ${f.first_name} ${f.last_name}
-  Company:     ${f.company}
-  Phone:       ${f.phone}
-  Email:       ${f.email}
-
-SHIPMENT
-  Type:          ${f.shipment_type}
-  Origin:        ${f.origin}
-  Destination:   ${f.destination}
-  Weight:        ${f.weight || 'Not specified'}
-  Freight Class: ${f.freight_class ? 'Class ' + f.freight_class : 'Not specified'}
-  Pallets/Pcs:   ${f.pallets || 'Not specified'}
-  Dimensions:    ${f.dimensions || 'Not specified'}
-  Commodity:     ${f.commodity || 'Not specified'}
-  Ship Date:     ${f.ship_date || 'ASAP'}
-
-ACCESSORIALS
-  ${accessorials.length ? accessorials.map(a => '• ' + a).join('\n  ') : 'None requested'}
-
-NOTES
-  ${f.message || 'None'}
-
-==========================================
-Submitted via assashipping.com
-    `.trim();
+    f.accessorials = fd.getAll('accessorials');
 
     let sent = false;
 
-    // Attempt Web3Forms (requires access key from web3forms.com)
-    if (WEB3FORMS_KEY !== 'YOUR_WEB3FORMS_KEY') {
-        try {
-            const res = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    access_key: WEB3FORMS_KEY,
-                    subject:    `New Freight Quote — ${f.first_name} ${f.last_name} | ${f.company}`,
-                    from_name:  `${f.first_name} ${f.last_name} via ASSA Shipping`,
-                    email:      f.email,
-                    message:    emailBody,
-                }),
-            });
-            const result = await res.json();
-            if (result.success) sent = true;
-        } catch (_) {}
-    }
+    // ── Try Cloudflare Pages Function (works when deployed to CF Pages) ──
+    try {
+        const res = await fetch('/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(f),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) sent = true;
+        }
+    } catch (_) {}
 
-    // Fallback: open mail client with pre-filled body
+    // ── Fallback: open the user's mail client ────────────────────────────
     if (!sent) {
-        const sub  = encodeURIComponent(`New Freight Quote — ${f.first_name} ${f.last_name} | ${f.company}`);
-        const body = encodeURIComponent(emailBody);
+        const accs = f.accessorials.length ? f.accessorials.join(', ') : 'None';
+        const body = encodeURIComponent(
+`NEW FREIGHT QUOTE — ASSA SHIPPING
+
+Name: ${f.first_name} ${f.last_name}
+Company: ${f.company}
+Phone: ${f.phone}
+Email: ${f.email}
+
+Type: ${f.shipment_type}
+Origin: ${f.origin}
+Destination: ${f.destination}
+Weight: ${f.weight || 'N/A'}
+Class: ${f.freight_class || 'N/A'}
+Pallets: ${f.pallets || 'N/A'}
+Dimensions: ${f.dimensions || 'N/A'}
+Commodity: ${f.commodity || 'N/A'}
+Ship Date: ${f.ship_date || 'ASAP'}
+Accessorials: ${accs}
+Notes: ${f.message || 'None'}`);
+        const sub = encodeURIComponent(`New Freight Quote — ${f.first_name} ${f.last_name} | ${f.company}`);
         window.open(`mailto:sean@assaoil.com?subject=${sub}&body=${body}`, '_blank');
         sent = true;
     }
@@ -2851,7 +2821,6 @@ Submitted via assashipping.com
     } else {
         label.textContent = 'Send Quote Request →';
         btn.disabled = false;
-        alert('Something went wrong. Please email us directly at sean@assaoil.com');
     }
 }
 </script>
