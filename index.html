@@ -475,7 +475,9 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            text-decoration: none;
             box-shadow: 0 8px 32px rgba(26,171,138,0.25);
         }
 
@@ -1234,6 +1236,8 @@
             transition: all 0.2s;
             white-space: nowrap;
             text-align: center;
+            text-decoration: none;
+            display: inline-block;
             box-shadow: 0 10px 36px rgba(26,171,138,0.3);
         }
 
@@ -1357,6 +1361,16 @@
             pointer-events: all;
         }
 
+        /* no-JS fallback: anchor links (#quoteModal) open the modal via :target */
+        .modal-bg:target {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-bg:target .modal {
+            transform: translateY(0) scale(1);
+        }
+
         .modal {
             background:
                 linear-gradient(var(--dark-2), var(--dark-2)) padding-box,
@@ -1405,6 +1419,7 @@
             border: none;
             border-radius: 50%;
             color: rgba(255,255,255,0.7);
+            text-decoration: none;
             font-size: 18px;
             cursor: pointer;
             display: flex;
@@ -1933,7 +1948,7 @@
                 <svg class="ic"><use href="#i-phone"/></svg>
                 (833) 378-7838
             </a>
-            <button class="btn-teal" onclick="openQuote()">Get a Quote</button>
+            <a class="btn-teal" href="#quoteModal" onclick="openQuote()">Get a Quote</a>
             <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
@@ -1951,7 +1966,7 @@
         <svg class="ic"><use href="#i-phone"/></svg>
         Call (833) 378-7838
     </a>
-    <a class="mm-quote" href="#" onclick="closeMenu(); openQuote(); return false;">Get a Free Quote</a>
+    <a class="mm-quote" href="#quoteModal" onclick="closeMenu(); openQuote();">Get a Free Quote</a>
 </div>
 
 <!-- ═══════════════════════════════ HERO ════════════════════════════════ -->
@@ -2001,9 +2016,9 @@
             Enterprise-grade logistics without the enterprise headache. Backed by ASSA Oil's established carrier network — competitive rates, real-time visibility, and a team that picks up the phone.
         </p>
         <div class="hero-actions">
-            <button class="btn-hero-primary" onclick="openQuote()">
+            <a class="btn-hero-primary" href="#quoteModal" onclick="openQuote()">
                 Get a Free Quote &nbsp;→
-            </button>
+            </a>
             <a class="btn-hero-ghost" href="#services">
                 Our Services
             </a>
@@ -2289,7 +2304,7 @@
                 <p>Get a competitive quote in under an hour. No commitments, no runaround — just straight answers and rates that make sense for your business.</p>
             </div>
             <div class="cta-right">
-                <button class="btn-cta-main" onclick="openQuote()">Get a Free Quote →</button>
+                <a class="btn-cta-main" href="#quoteModal" onclick="openQuote()">Get a Free Quote →</a>
                 <a href="tel:8333787838" class="btn-cta-phone">
                     <svg class="ic"><use href="#i-phone"/></svg>
                     (833) 378-7838
@@ -2332,7 +2347,7 @@
                 <h4>Get In Touch</h4>
                 <a href="tel:8333787838">(833) 378-7838</a>
                 <a href="mailto:sean@assaoil.com">sean@assaoil.com</a>
-                <a href="#" onclick="openQuote();return false;">Request a Quote</a>
+                <a href="#quoteModal" onclick="openQuote()">Request a Quote</a>
             </div>
         </div>
         <div class="foot-bottom">
@@ -2350,7 +2365,7 @@
                 <h2 id="modalTitle">Request a Freight Quote</h2>
                 <p>Fill out the form — we'll respond within 1 hour with competitive rates.</p>
             </div>
-            <button class="modal-close" onclick="closeQuote()" aria-label="Close">✕</button>
+            <a class="modal-close" href="#!" onclick="closeQuote()" aria-label="Close">✕</a>
         </div>
 
         <div id="formWrap">
@@ -2480,7 +2495,7 @@
             <p>
                 Thanks! Our freight team will review your details and get back to you <strong style="color:var(--teal)">within 1 hour</strong> with a competitive quote.
             </p>
-            <button class="btn-hero-primary" onclick="closeQuote()">Close &nbsp;→</button>
+            <a class="btn-hero-primary" href="#!" onclick="closeQuote()">Close &nbsp;→</a>
         </div>
     </div>
 </div>
@@ -2699,7 +2714,10 @@ const trackCard = document.getElementById('trackCard');
 if (trackCard) trackObs.observe(trackCard);
 
 // ── MODAL ─────────────────────────────────────────────────────────────────
+let modalOpenedAt = 0;
+
 function openQuote() {
+    modalOpenedAt = Date.now();
     document.getElementById('quoteModal').classList.add('open');
     document.body.style.overflow = 'hidden';
 }
@@ -2707,6 +2725,10 @@ function openQuote() {
 function closeQuote() {
     document.getElementById('quoteModal').classList.remove('open');
     document.body.style.overflow = '';
+    // clear the :target hash so the no-JS fallback doesn't hold it open
+    if (location.hash === '#quoteModal') {
+        history.replaceState(null, '', location.pathname + location.search);
+    }
     // reset form after close
     setTimeout(() => {
         document.getElementById('formWrap').style.display = '';
@@ -2718,7 +2740,13 @@ function closeQuote() {
     }, 400);
 }
 
+// open if the page is loaded with #quoteModal already in the URL
+if (location.hash === '#quoteModal') openQuote();
+
 document.getElementById('quoteModal').addEventListener('click', e => {
+    // ignore the ghost tap that follows opening on touch devices,
+    // otherwise the same tap that opens the sheet instantly closes it
+    if (Date.now() - modalOpenedAt < 400) return;
     if (e.target === document.getElementById('quoteModal')) closeQuote();
 });
 
