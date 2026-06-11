@@ -1384,6 +1384,68 @@
             min-height: 90px;
         }
 
+        /* accessorial toggle chips */
+        .acc-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .acc {
+            position: relative;
+        }
+
+        .acc input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .acc span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 100px;
+            padding: 8px 15px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.65);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.18s ease;
+        }
+
+        .acc span::before {
+            content: '+';
+            font-size: 14px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.35);
+            transition: all 0.18s ease;
+        }
+
+        .acc span:hover {
+            border-color: rgba(26,171,138,0.45);
+            color: white;
+        }
+
+        .acc input:checked + span {
+            background: rgba(26,171,138,0.15);
+            border-color: var(--teal);
+            color: var(--teal-light);
+            box-shadow: 0 0 14px rgba(26,171,138,0.18);
+        }
+
+        .acc input:checked + span::before {
+            content: '✓';
+            color: var(--teal-bright);
+        }
+
+        .acc input:focus-visible + span {
+            box-shadow: 0 0 0 3px rgba(26,171,138,0.3);
+        }
+
         .submit-btn {
             width: 100%;
             background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
@@ -2105,12 +2167,65 @@
                         <input type="text" name="destination" placeholder="Chicago, IL" required>
                     </div>
                     <div class="fg">
+                        <label>Freight Class (LTL)</label>
+                        <select name="freight_class">
+                            <option value="">Not sure / N/A</option>
+                            <option value="50">Class 50</option>
+                            <option value="55">Class 55</option>
+                            <option value="60">Class 60</option>
+                            <option value="65">Class 65</option>
+                            <option value="70">Class 70</option>
+                            <option value="77.5">Class 77.5</option>
+                            <option value="85">Class 85</option>
+                            <option value="92.5">Class 92.5</option>
+                            <option value="100">Class 100</option>
+                            <option value="110">Class 110</option>
+                            <option value="125">Class 125</option>
+                            <option value="150">Class 150</option>
+                            <option value="175">Class 175</option>
+                            <option value="200">Class 200</option>
+                            <option value="250">Class 250</option>
+                            <option value="300">Class 300</option>
+                            <option value="400">Class 400</option>
+                            <option value="500">Class 500</option>
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label>Pallets / Pieces</label>
+                        <input type="text" name="pallets" placeholder="e.g. 4 pallets">
+                    </div>
+                    <div class="fg">
+                        <label>Dimensions (L × W × H)</label>
+                        <input type="text" name="dimensions" placeholder='e.g. 48" × 40" × 60"'>
+                    </div>
+                    <div class="fg">
                         <label>Target Ship Date</label>
                         <input type="date" name="ship_date">
                     </div>
                     <div class="fg wide">
                         <label>Commodity / Cargo Description</label>
                         <input type="text" name="commodity" placeholder="What are you shipping? (e.g. industrial machinery, lubricants, palletized goods)">
+                    </div>
+                    <div class="fg wide">
+                        <label>Accessorials &amp; Special Services</label>
+                        <div class="acc-grid">
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate — Pickup"><span>Liftgate Pickup</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate — Delivery"><span>Liftgate Delivery</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Residential Pickup"><span>Residential Pickup</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Residential Delivery"><span>Residential Delivery</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Inside Pickup"><span>Inside Pickup</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Inside Delivery"><span>Inside Delivery</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Limited Access Location"><span>Limited Access</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Appointment Required"><span>Appointment Required</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Delivery Notification / Call Ahead"><span>Call Ahead</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat"><span>Hazmat</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Temperature Controlled / Reefer"><span>Temp Controlled</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Stackable Freight"><span>Stackable</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Tarping Required (Flatbed)"><span>Tarping</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Protect From Freeze"><span>Protect From Freeze</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Trade Show / Convention"><span>Trade Show</span></label>
+                            <label class="acc"><input type="checkbox" name="accessorials" value="Drop Trailer"><span>Drop Trailer</span></label>
+                        </div>
                     </div>
                     <div class="fg wide">
                         <label>Additional Notes</label>
@@ -2387,6 +2502,7 @@ async function handleSubmit(e) {
 
     const fd = new FormData(form);
     const f  = Object.fromEntries(fd.entries());
+    const accessorials = fd.getAll('accessorials');
 
     const emailBody = `
 NEW FREIGHT QUOTE REQUEST — ASSA SHIPPING
@@ -2399,12 +2515,18 @@ CONTACT
   Email:       ${f.email}
 
 SHIPMENT
-  Type:        ${f.shipment_type}
-  Origin:      ${f.origin}
-  Destination: ${f.destination}
-  Weight:      ${f.weight || 'Not specified'}
-  Commodity:   ${f.commodity || 'Not specified'}
-  Ship Date:   ${f.ship_date || 'ASAP'}
+  Type:          ${f.shipment_type}
+  Origin:        ${f.origin}
+  Destination:   ${f.destination}
+  Weight:        ${f.weight || 'Not specified'}
+  Freight Class: ${f.freight_class ? 'Class ' + f.freight_class : 'Not specified'}
+  Pallets/Pcs:   ${f.pallets || 'Not specified'}
+  Dimensions:    ${f.dimensions || 'Not specified'}
+  Commodity:     ${f.commodity || 'Not specified'}
+  Ship Date:     ${f.ship_date || 'ASAP'}
+
+ACCESSORIALS
+  ${accessorials.length ? accessorials.map(a => '• ' + a).join('\n  ') : 'None requested'}
 
 NOTES
   ${f.message || 'None'}
