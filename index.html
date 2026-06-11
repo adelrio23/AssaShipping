@@ -1501,7 +1501,63 @@
             min-height: 90px;
         }
 
-        /* accessorial toggle chips */
+        /* mode-specific field groups */
+        .mode-fields { display: none; }
+        .mode-fields.active { display: contents; }
+
+        /* mode selector tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            grid-column: 1 / -1;
+            margin-bottom: 4px;
+        }
+
+        .mode-tab {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.55);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .mode-tab:hover {
+            border-color: rgba(26,171,138,0.4);
+            color: rgba(255,255,255,0.85);
+        }
+
+        .mode-tab.active {
+            background: rgba(26,171,138,0.12);
+            border-color: var(--teal);
+            color: var(--teal-light);
+            box-shadow: 0 0 20px rgba(26,171,138,0.15);
+        }
+
+        .mode-tab svg { font-size: 17px; flex-shrink: 0; }
+
+        .form-section-label {
+            grid-column: 1 / -1;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+            padding: 8px 0 2px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            margin-top: 4px;
+        }
         .acc-grid {
             display: flex;
             flex-wrap: wrap;
@@ -2372,6 +2428,8 @@
         <div id="formWrap">
             <form id="quoteForm" novalidate onsubmit="handleSubmit(event)">
                 <div class="form-grid">
+
+                    <!-- ── CONTACT ── -->
                     <div class="fg">
                         <label>First Name *</label>
                         <input type="text" name="first_name" placeholder="John" required>
@@ -2392,96 +2450,317 @@
                         <label>Email Address *</label>
                         <input type="email" name="email" placeholder="john@yourcompany.com" required>
                     </div>
-                    <div class="fg">
-                        <label>Shipment Type *</label>
-                        <select name="shipment_type" required>
-                            <option value="">Select type...</option>
-                            <option value="LTL Freight">LTL Freight</option>
-                            <option value="FTL Freight">FTL Freight</option>
-                            <option value="International — Ocean (FCL)">International — Ocean FCL</option>
-                            <option value="International — Ocean (LCL)">International — Ocean LCL</option>
-                            <option value="International — Air Freight">International — Air Freight</option>
-                            <option value="Expedited / Time-Critical">Expedited / Time-Critical</option>
-                            <option value="Not Sure — Need Guidance">Not Sure — Need Guidance</option>
-                        </select>
+
+                    <!-- ── SHIPMENT MODE TABS ── -->
+                    <div class="form-section-label">Shipment Type *</div>
+                    <div class="mode-tabs" id="modeTabs">
+                        <button type="button" class="mode-tab" data-mode="ltl" onclick="setMode('ltl')">
+                            <svg class="ic" style="font-size:17px"><use href="#i-truck"/></svg> LTL
+                        </button>
+                        <button type="button" class="mode-tab" data-mode="ftl" onclick="setMode('ftl')">
+                            <svg class="ic" style="font-size:17px"><use href="#i-ftl"/></svg> FTL
+                        </button>
+                        <button type="button" class="mode-tab" data-mode="ocean" onclick="setMode('ocean')">
+                            <svg class="ic" style="font-size:17px"><use href="#i-ship"/></svg> Ocean
+                        </button>
+                        <button type="button" class="mode-tab" data-mode="air" onclick="setMode('air')">
+                            ✈ Air Freight
+                        </button>
+                        <button type="button" class="mode-tab" data-mode="expedited" onclick="setMode('expedited')">
+                            <svg class="ic" style="font-size:17px"><use href="#i-zap"/></svg> Expedited
+                        </button>
                     </div>
-                    <div class="fg">
-                        <label>Estimated Weight</label>
-                        <input type="text" name="weight" placeholder="e.g. 5,000 lbs">
-                    </div>
+                    <input type="hidden" name="shipment_type" id="shipment_type_val">
+
+                    <!-- ── SHARED: ORIGIN / DESTINATION / DATE ── -->
                     <div class="fg">
                         <label>Origin (City, State / Country) *</label>
-                        <input type="text" name="origin" placeholder="Houston, TX" required>
+                        <input type="text" name="origin" id="originField" placeholder="Houston, TX" required>
                     </div>
                     <div class="fg">
                         <label>Destination *</label>
-                        <input type="text" name="destination" placeholder="Chicago, IL" required>
+                        <input type="text" name="destination" id="destField" placeholder="Chicago, IL" required>
                     </div>
                     <div class="fg">
-                        <label>Freight Class (LTL)</label>
-                        <select name="freight_class">
-                            <option value="">Not sure / N/A</option>
-                            <option value="50">Class 50</option>
-                            <option value="55">Class 55</option>
-                            <option value="60">Class 60</option>
-                            <option value="65">Class 65</option>
-                            <option value="70">Class 70</option>
-                            <option value="77.5">Class 77.5</option>
-                            <option value="85">Class 85</option>
-                            <option value="92.5">Class 92.5</option>
-                            <option value="100">Class 100</option>
-                            <option value="110">Class 110</option>
-                            <option value="125">Class 125</option>
-                            <option value="150">Class 150</option>
-                            <option value="175">Class 175</option>
-                            <option value="200">Class 200</option>
-                            <option value="250">Class 250</option>
-                            <option value="300">Class 300</option>
-                            <option value="400">Class 400</option>
-                            <option value="500">Class 500</option>
-                        </select>
-                    </div>
-                    <div class="fg">
-                        <label>Pallets / Pieces</label>
-                        <input type="text" name="pallets" placeholder="e.g. 4 pallets">
-                    </div>
-                    <div class="fg">
-                        <label>Dimensions (L × W × H)</label>
-                        <input type="text" name="dimensions" placeholder='e.g. 48" × 40" × 60"'>
+                        <label>Commodity / Cargo *</label>
+                        <input type="text" name="commodity" placeholder="e.g. industrial equipment, lubricants" required>
                     </div>
                     <div class="fg">
                         <label>Target Ship Date</label>
                         <input type="date" name="ship_date">
                     </div>
-                    <div class="fg wide">
-                        <label>Commodity / Cargo Description</label>
-                        <input type="text" name="commodity" placeholder="What are you shipping? (e.g. industrial machinery, lubricants, palletized goods)">
-                    </div>
-                    <div class="fg wide">
-                        <label>Accessorials &amp; Special Services</label>
-                        <div class="acc-grid">
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate — Pickup"><span>Liftgate Pickup</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate — Delivery"><span>Liftgate Delivery</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Residential Pickup"><span>Residential Pickup</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Residential Delivery"><span>Residential Delivery</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Inside Pickup"><span>Inside Pickup</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Inside Delivery"><span>Inside Delivery</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Limited Access Location"><span>Limited Access</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Appointment Required"><span>Appointment Required</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Delivery Notification / Call Ahead"><span>Call Ahead</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat"><span>Hazmat</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Temperature Controlled / Reefer"><span>Temp Controlled</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Stackable Freight"><span>Stackable</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Tarping Required (Flatbed)"><span>Tarping</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Protect From Freeze"><span>Protect From Freeze</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Trade Show / Convention"><span>Trade Show</span></label>
-                            <label class="acc"><input type="checkbox" name="accessorials" value="Drop Trailer"><span>Drop Trailer</span></label>
+
+                    <!-- ══ LTL FIELDS ══════════════════════════════════════ -->
+                    <div class="mode-fields" id="fields-ltl">
+                        <div class="form-section-label">LTL Details</div>
+                        <div class="fg">
+                            <label>Weight (lbs) *</label>
+                            <input type="text" name="weight" placeholder="e.g. 2,400 lbs">
+                        </div>
+                        <div class="fg">
+                            <label>Pallets / Pieces</label>
+                            <input type="text" name="pallets" placeholder="e.g. 4 pallets">
+                        </div>
+                        <div class="fg">
+                            <label>Dimensions (L × W × H)</label>
+                            <input type="text" name="dimensions" placeholder='48" × 40" × 60"'>
+                        </div>
+                        <div class="fg">
+                            <label>Freight Class</label>
+                            <select name="freight_class">
+                                <option value="">Not sure</option>
+                                <option>50</option><option>55</option><option>60</option>
+                                <option>65</option><option>70</option><option>77.5</option>
+                                <option>85</option><option>92.5</option><option>100</option>
+                                <option>110</option><option>125</option><option>150</option>
+                                <option>175</option><option>200</option><option>250</option>
+                                <option>300</option><option>400</option><option>500</option>
+                            </select>
+                        </div>
+                        <div class="fg wide">
+                            <label>Accessorials</label>
+                            <div class="acc-grid">
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate Pickup"><span>Liftgate Pickup</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate Delivery"><span>Liftgate Delivery</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Residential Pickup"><span>Residential Pickup</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Residential Delivery"><span>Residential Delivery</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Inside Pickup"><span>Inside Pickup</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Inside Delivery"><span>Inside Delivery</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Limited Access"><span>Limited Access</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Appointment Required"><span>Appointment Required</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Call Ahead"><span>Call Ahead</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat"><span>Hazmat</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Temp Controlled"><span>Temp Controlled</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Protect From Freeze"><span>Protect From Freeze</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Stackable"><span>Stackable</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Trade Show"><span>Trade Show</span></label>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- ══ FTL FIELDS ══════════════════════════════════════ -->
+                    <div class="mode-fields" id="fields-ftl">
+                        <div class="form-section-label">FTL Details</div>
+                        <div class="fg">
+                            <label>Equipment Type *</label>
+                            <select name="equipment_type">
+                                <option value="">Select...</option>
+                                <option>Dry Van (53')</option>
+                                <option>Reefer / Temperature Controlled</option>
+                                <option>Flatbed (48')</option>
+                                <option>Flatbed (53')</option>
+                                <option>Step Deck</option>
+                                <option>Conestoga / Rolling Tarp</option>
+                                <option>RGN / Lowboy</option>
+                                <option>Power Only</option>
+                                <option>Not Sure</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>Total Weight (lbs)</label>
+                            <input type="text" name="weight" placeholder="e.g. 42,000 lbs">
+                        </div>
+                        <div class="fg">
+                            <label>Total Length / Dimensions</label>
+                            <input type="text" name="dimensions" placeholder='e.g. 48\' × 8\' × 9\''>
+                        </div>
+                        <div class="fg">
+                            <label>Temp Range (if Reefer)</label>
+                            <input type="text" name="temp_range" placeholder="e.g. 34–38°F">
+                        </div>
+                        <div class="fg wide">
+                            <label>Accessorials</label>
+                            <div class="acc-grid">
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat"><span>Hazmat</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Team Driver"><span>Team Driver</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Drop Trailer"><span>Drop Trailer</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Tarping Required"><span>Tarping</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Oversize / Overweight"><span>Oversize / OW</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Escort Required"><span>Escort Required</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Lumper Service"><span>Lumper Service</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Inside Delivery"><span>Inside Delivery</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Appointment Required"><span>Appointment Required</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Protect From Freeze"><span>Protect From Freeze</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ══ OCEAN FIELDS ════════════════════════════════════ -->
+                    <div class="mode-fields" id="fields-ocean">
+                        <div class="form-section-label">Ocean Freight Details</div>
+                        <div class="fg">
+                            <label>FCL or LCL?</label>
+                            <select name="ocean_type">
+                                <option value="">Select...</option>
+                                <option value="FCL">FCL — Full Container Load</option>
+                                <option value="LCL">LCL — Less than Container Load</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>Container Size (FCL)</label>
+                            <select name="container_size">
+                                <option value="">Select...</option>
+                                <option>20' GP</option>
+                                <option>40' GP</option>
+                                <option>40' HC</option>
+                                <option>45' HC</option>
+                                <option>20' Reefer</option>
+                                <option>40' Reefer</option>
+                                <option>20' Open Top</option>
+                                <option>40' Flat Rack</option>
+                                <option>Not Sure</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>Origin Port / City</label>
+                            <input type="text" name="origin_port" placeholder="e.g. Houston, TX / Shenzhen, CN">
+                        </div>
+                        <div class="fg">
+                            <label>Destination Port / City</label>
+                            <input type="text" name="dest_port" placeholder="e.g. Los Angeles, CA / Rotterdam, NL">
+                        </div>
+                        <div class="fg">
+                            <label>Incoterms</label>
+                            <select name="incoterms">
+                                <option value="">Not sure</option>
+                                <option>EXW — Ex Works</option>
+                                <option>FCA — Free Carrier</option>
+                                <option>FOB — Free on Board</option>
+                                <option>CFR — Cost & Freight</option>
+                                <option>CIF — Cost, Insurance & Freight</option>
+                                <option>DAP — Delivered at Place</option>
+                                <option>DDP — Delivered Duty Paid</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>HS Code (if known)</label>
+                            <input type="text" name="hs_code" placeholder="e.g. 8413.50">
+                        </div>
+                        <div class="fg">
+                            <label>Cargo Weight / CBM</label>
+                            <input type="text" name="weight" placeholder="e.g. 18,000 lbs / 24 CBM">
+                        </div>
+                        <div class="fg">
+                            <label>Estimated Commercial Value</label>
+                            <input type="text" name="cargo_value" placeholder="e.g. $85,000 USD">
+                        </div>
+                        <div class="fg wide">
+                            <label>Accessorials</label>
+                            <div class="acc-grid">
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat / DG Cargo"><span>Hazmat / DG</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Customs Clearance — Import"><span>Customs (Import)</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Customs Clearance — Export"><span>Customs (Export)</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="ISF Filing"><span>ISF Filing</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Cargo Insurance"><span>Cargo Insurance</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Drayage / Port Pickup"><span>Drayage</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Door Delivery"><span>Door Delivery</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Fumigation Certificate"><span>Fumigation Cert</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ══ AIR FREIGHT FIELDS ══════════════════════════════ -->
+                    <div class="mode-fields" id="fields-air">
+                        <div class="form-section-label">Air Freight Details</div>
+                        <div class="fg">
+                            <label>Service Level</label>
+                            <select name="air_service">
+                                <option value="">Select...</option>
+                                <option>Express (Next Flight Out)</option>
+                                <option>Priority (1–2 days)</option>
+                                <option>Standard (3–5 days)</option>
+                                <option>Deferred / Economy</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>Actual Weight (lbs/kg)</label>
+                            <input type="text" name="weight" placeholder="e.g. 500 lbs / 227 kg">
+                        </div>
+                        <div class="fg">
+                            <label>Dimensions (L × W × H)</label>
+                            <input type="text" name="dimensions" placeholder='e.g. 40" × 28" × 20"'>
+                        </div>
+                        <div class="fg">
+                            <label>Pieces / Skids</label>
+                            <input type="text" name="pallets" placeholder="e.g. 3 pieces">
+                        </div>
+                        <div class="fg">
+                            <label>Origin Airport / City</label>
+                            <input type="text" name="origin_port" placeholder="e.g. IAH — Houston">
+                        </div>
+                        <div class="fg">
+                            <label>Destination Airport / City</label>
+                            <input type="text" name="dest_port" placeholder="e.g. PVG — Shanghai">
+                        </div>
+                        <div class="fg">
+                            <label>Incoterms</label>
+                            <select name="incoterms">
+                                <option value="">Not sure</option>
+                                <option>EXW</option><option>FCA</option><option>CPT</option>
+                                <option>DAP</option><option>DDP</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>HS Code (if known)</label>
+                            <input type="text" name="hs_code" placeholder="e.g. 8413.50">
+                        </div>
+                        <div class="fg wide">
+                            <label>Accessorials</label>
+                            <div class="acc-grid">
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat / DG"><span>Hazmat / DG</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Cargo Insurance"><span>Cargo Insurance</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Customs Clearance"><span>Customs</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Door Pickup"><span>Door Pickup</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Door Delivery"><span>Door Delivery</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="White Glove"><span>White Glove</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ══ EXPEDITED FIELDS ════════════════════════════════ -->
+                    <div class="mode-fields" id="fields-expedited">
+                        <div class="form-section-label">Expedited Details</div>
+                        <div class="fg">
+                            <label>Equipment Preference</label>
+                            <select name="equipment_type">
+                                <option value="">Any available</option>
+                                <option>Sprinter / Cargo Van</option>
+                                <option>Straight Truck</option>
+                                <option>Dry Van (53')</option>
+                                <option>Reefer</option>
+                                <option>Flatbed</option>
+                            </select>
+                        </div>
+                        <div class="fg">
+                            <label>Weight (lbs)</label>
+                            <input type="text" name="weight" placeholder="e.g. 1,200 lbs">
+                        </div>
+                        <div class="fg">
+                            <label>Must Pickup By</label>
+                            <input type="datetime-local" name="pickup_by">
+                        </div>
+                        <div class="fg">
+                            <label>Must Deliver By</label>
+                            <input type="datetime-local" name="deliver_by">
+                        </div>
+                        <div class="fg wide">
+                            <label>Accessorials</label>
+                            <div class="acc-grid">
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Hazmat"><span>Hazmat</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Team Driver"><span>Team Driver</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Hand Carry"><span>Hand Carry</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="White Glove"><span>White Glove</span></label>
+                                <label class="acc"><input type="checkbox" name="accessorials" value="Liftgate"><span>Liftgate</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── NOTES (always shown) ── -->
                     <div class="fg wide">
                         <label>Additional Notes</label>
-                        <textarea name="message" placeholder="Hazmat? Recurring lane? Special handling requirements? Anything else we should know..."></textarea>
+                        <textarea name="message" placeholder="Anything else — recurring lanes, special packaging, security requirements..."></textarea>
                     </div>
+
                 </div>
                 <button type="submit" class="submit-btn" id="submitBtn">
                     <span id="btnLabel">Send Quote Request →</span>
@@ -2714,6 +2993,33 @@ const trackObs = new IntersectionObserver(entries => {
 const trackCard = document.getElementById('trackCard');
 if (trackCard) trackObs.observe(trackCard);
 
+// ── QUOTE FORM MODE SWITCHER ──────────────────────────────────────────────
+const modeConfig = {
+    ltl:       { label: 'LTL Freight',           origin: 'City, State',       dest: 'City, State' },
+    ftl:       { label: 'FTL Freight',            origin: 'City, State',       dest: 'City, State' },
+    ocean:     { label: 'International — Ocean',  origin: 'Origin Port / City', dest: 'Dest Port / City' },
+    air:       { label: 'International — Air',    origin: 'Origin Airport / City', dest: 'Dest Airport / City' },
+    expedited: { label: 'Expedited / Time-Critical', origin: 'City, State',    dest: 'City, State' },
+};
+
+let currentMode = null;
+
+function setMode(mode) {
+    currentMode = mode;
+    // update tabs
+    document.querySelectorAll('.mode-tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.mode === mode));
+    // show/hide field groups
+    document.querySelectorAll('.mode-fields').forEach(el => {
+        el.classList.toggle('active', el.id === 'fields-' + mode);
+    });
+    // update hidden input
+    document.getElementById('shipment_type_val').value = modeConfig[mode].label;
+    // update placeholders
+    document.getElementById('originField').placeholder = modeConfig[mode].origin;
+    document.getElementById('destField').placeholder   = modeConfig[mode].dest;
+}
+
 // ── MODAL ─────────────────────────────────────────────────────────────────
 let _modalTs = 0;
 
@@ -2730,6 +3036,9 @@ function closeQuote() {
         document.getElementById('formWrap').style.display = '';
         document.getElementById('successState').classList.remove('show');
         document.getElementById('quoteForm').reset();
+        currentMode = null;
+        document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.mode-fields').forEach(el => el.classList.remove('active'));
         const btn = document.getElementById('submitBtn');
         btn.disabled = false;
         document.getElementById('btnLabel').textContent = 'Send Quote Request →';
@@ -2755,6 +3064,14 @@ async function handleSubmit(e) {
     const btn   = document.getElementById('submitBtn');
     const label = document.getElementById('btnLabel');
 
+    // validate mode selected
+    if (!currentMode) {
+        document.getElementById('modeTabs').style.outline = '2px solid #ef4444';
+        document.getElementById('modeTabs').style.borderRadius = '12px';
+        setTimeout(() => document.getElementById('modeTabs').style.outline = '', 2000);
+        btn.disabled = false;
+        return;
+    }
     // validation
     let valid = true;
     form.querySelectorAll('[required]').forEach(field => {
