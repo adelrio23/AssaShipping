@@ -15,6 +15,7 @@
             --teal: #1aab8a;
             --teal-dark: #148f72;
             --teal-light: #22d3ae;
+            --teal-bright: #34f5cc;
             --teal-glow: rgba(26,171,138,0.25);
             --dark: #060d1f;
             --dark-2: #0b1527;
@@ -35,6 +36,51 @@
             line-height: 1.6;
         }
 
+        ::selection { background: var(--teal); color: white; }
+
+        body::-webkit-scrollbar { width: 10px; }
+        body::-webkit-scrollbar-track { background: var(--dark); }
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--teal-dark), var(--teal));
+            border-radius: 5px;
+            border: 2px solid var(--dark);
+        }
+
+        /* film grain for depth */
+        .grain {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* shared stroke icon style */
+        .ic {
+            width: 1em; height: 1em;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        .grad-text {
+            background: linear-gradient(100deg, var(--teal) 10%, var(--teal-bright) 60%, var(--teal-light) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradShift 5s ease infinite;
+        }
+
+        @keyframes gradShift {
+            0%,100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
         /* ─── NAVBAR ─────────────────────────────────────────────── */
         nav {
             position: fixed;
@@ -45,9 +91,9 @@
         }
 
         nav.scrolled {
-            background: rgba(6,13,31,0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(6,13,31,0.88);
+            backdrop-filter: blur(18px) saturate(1.4);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4);
             padding: 14px 0;
             border-bottom: 1px solid rgba(26,171,138,0.18);
         }
@@ -64,24 +110,30 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 11px;
             text-decoration: none;
         }
 
         .logo-mark {
-            width: 38px;
-            height: 38px;
-            background: var(--teal);
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 900;
-            font-size: 20px;
             color: white;
-            letter-spacing: -1px;
             flex-shrink: 0;
+            box-shadow: 0 4px 18px rgba(26,171,138,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+
+        .logo-mark svg {
+            width: 21px; height: 21px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .logo-words {
@@ -105,10 +157,24 @@
             text-decoration: none;
             font-size: 15px;
             font-weight: 500;
+            position: relative;
             transition: color 0.2s;
         }
 
-        .nav-links a:hover { color: var(--teal); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0; bottom: -5px;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--teal), var(--teal-light));
+            border-radius: 2px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s ease;
+        }
+
+        .nav-links a:hover { color: white; }
+        .nav-links a:hover::after { transform: scaleX(1); }
 
         .nav-right {
             display: flex;
@@ -120,10 +186,42 @@
             font-size: 14px;
             color: rgba(255,255,255,0.65);
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-phone:hover { color: var(--teal-light); }
+        .nav-phone .ic { font-size: 15px; color: var(--teal); }
+
+        /* shimmer-capable button base */
+        .btn-teal, .btn-hero-primary, .btn-cta-main, .submit-btn {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .btn-teal::before, .btn-hero-primary::before,
+        .btn-cta-main::before, .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -75%;
+            width: 50%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+
+        .btn-teal:hover::before, .btn-hero-primary:hover::before,
+        .btn-cta-main:hover::before, .submit-btn:hover:not(:disabled)::before {
+            left: 125%;
         }
 
         .btn-teal {
-            background: var(--teal);
+            background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
             color: white;
             border: none;
             padding: 11px 22px;
@@ -140,7 +238,6 @@
         }
 
         .btn-teal:hover {
-            background: var(--teal-dark);
             transform: translateY(-1px);
             box-shadow: 0 8px 24px var(--teal-glow);
         }
@@ -164,19 +261,14 @@
         .hero-gradient {
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                110deg,
-                rgba(6,13,31,0.90) 0%,
-                rgba(6,13,31,0.75) 50%,
-                rgba(6,13,31,0.55) 100%
-            );
+            background:
+                radial-gradient(ellipse 60% 70% at 85% 20%, rgba(26,171,138,0.10), transparent 60%),
+                linear-gradient(110deg, rgba(6,13,31,0.92) 0%, rgba(6,13,31,0.72) 50%, rgba(6,13,31,0.45) 100%);
         }
 
         .hero-content {
             position: relative;
             z-index: 10;
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 140px 28px 100px;
             max-width: 700px;
             margin-left: 8vw;
@@ -186,8 +278,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(26,171,138,0.12);
+            background: rgba(26,171,138,0.10);
             border: 1px solid rgba(26,171,138,0.35);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 24px rgba(26,171,138,0.12);
             color: var(--teal-light);
             padding: 7px 15px;
             border-radius: 100px;
@@ -202,7 +295,8 @@
             width: 7px;
             height: 7px;
             border-radius: 50%;
-            background: var(--teal);
+            background: var(--teal-bright);
+            box-shadow: 0 0 10px var(--teal-bright);
             animation: blink 2s ease infinite;
         }
 
@@ -218,11 +312,7 @@
             line-height: 1.0;
             letter-spacing: -3px;
             margin-bottom: 24px;
-        }
-
-        .hero h1 em {
-            font-style: normal;
-            color: var(--teal);
+            text-shadow: 0 10px 60px rgba(0,0,0,0.5);
         }
 
         .hero-sub {
@@ -241,15 +331,29 @@
         }
 
         .hero-tag {
-            background: rgba(255,255,255,0.07);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.13);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             color: rgba(255,255,255,0.85);
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 7px 15px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.3px;
+            transition: all 0.25s;
         }
+
+        .hero-tag:hover {
+            border-color: rgba(26,171,138,0.5);
+            background: rgba(26,171,138,0.1);
+            transform: translateY(-2px);
+        }
+
+        .hero-tag .ic { font-size: 16px; color: var(--teal-light); }
 
         .hero-actions {
             display: flex;
@@ -259,7 +363,7 @@
         }
 
         .btn-hero-primary {
-            background: var(--teal);
+            background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
             color: white;
             border: none;
             padding: 18px 36px;
@@ -271,16 +375,18 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 8px 32px rgba(26,171,138,0.25);
         }
 
         .btn-hero-primary:hover {
-            background: var(--teal-dark);
             transform: translateY(-2px);
-            box-shadow: 0 16px 48px var(--teal-glow);
+            box-shadow: 0 16px 48px rgba(26,171,138,0.4);
         }
 
         .btn-hero-ghost {
-            background: transparent;
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             color: rgba(255,255,255,0.85);
             border: 1.5px solid rgba(255,255,255,0.22);
             padding: 16px 30px;
@@ -297,7 +403,86 @@
 
         .btn-hero-ghost:hover {
             border-color: var(--teal);
-            color: var(--teal);
+            color: var(--teal-light);
+            background: rgba(26,171,138,0.06);
+        }
+
+        /* floating glass status chips */
+        .hero-chips {
+            position: absolute;
+            right: 6vw;
+            top: 0;
+            bottom: 0;
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        .chip {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(11,21,39,0.55);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 14px;
+            padding: 13px 18px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            white-space: nowrap;
+        }
+
+        .chip-1 { top: 26%; right: 0; animation: floaty 6s ease-in-out infinite; }
+        .chip-2 { top: 46%; right: 130px; animation: floaty 7s ease-in-out 1.2s infinite; }
+        .chip-3 { top: 66%; right: 20px; animation: floaty 6.5s ease-in-out 0.6s infinite; }
+
+        @keyframes floaty {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-14px); }
+        }
+
+        .chip-ic {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(26,171,138,0.15);
+            color: var(--teal-light);
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .chip-title { font-size: 13px; font-weight: 700; }
+        .chip-sub { font-size: 11.5px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+
+        /* scroll hint */
+        .scroll-hint {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 24px; height: 38px;
+            border: 2px solid rgba(255,255,255,0.25);
+            border-radius: 12px;
+        }
+
+        .scroll-hint::after {
+            content: '';
+            position: absolute;
+            left: 50%; top: 7px;
+            width: 4px; height: 8px;
+            margin-left: -2px;
+            border-radius: 2px;
+            background: var(--teal-light);
+            animation: scrollDot 1.8s ease infinite;
+        }
+
+        @keyframes scrollDot {
+            0% { opacity: 1; transform: translateY(0); }
+            70% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 0; }
         }
 
         /* ─── TICKER / STATS ──────────────────────────────────────── */
@@ -305,8 +490,9 @@
             background: var(--dark-2);
             border-top: 1px solid rgba(26,171,138,0.15);
             border-bottom: 1px solid rgba(26,171,138,0.08);
-            padding: 0;
             overflow: hidden;
+            -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+            mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
         }
 
         .ticker-track {
@@ -314,6 +500,8 @@
             animation: ticker 30s linear infinite;
             width: max-content;
         }
+
+        .ticker-bar:hover .ticker-track { animation-play-state: paused; }
 
         .ticker-item {
             display: flex;
@@ -350,7 +538,9 @@
         }
 
         .s-tag {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             color: var(--teal);
             font-size: 12px;
             font-weight: 700;
@@ -358,6 +548,14 @@
             letter-spacing: 2.5px;
             margin-bottom: 16px;
         }
+
+        .s-tag::before, .s-tag::after {
+            content: '';
+            width: 28px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--teal));
+        }
+
+        .s-tag::after { background: linear-gradient(90deg, var(--teal), transparent); }
 
         .s-title {
             font-family: 'Space Grotesk', sans-serif;
@@ -385,7 +583,9 @@
         /* ─── SERVICES ────────────────────────────────────────────── */
         .services {
             padding: 110px 0;
-            background: var(--dark);
+            background:
+                radial-gradient(ellipse 50% 40% at 50% 0%, rgba(26,171,138,0.05), transparent),
+                var(--dark);
         }
 
         .services-grid {
@@ -395,8 +595,10 @@
         }
 
         .svc-card {
-            background: var(--dark-3);
-            border: 1px solid rgba(255,255,255,0.07);
+            border: 1px solid transparent;
+            background:
+                linear-gradient(var(--dark-3), var(--dark-3)) padding-box,
+                linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03) 40%, rgba(26,171,138,0.1)) border-box;
             border-radius: 20px;
             padding: 40px 32px;
             position: relative;
@@ -409,30 +611,49 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--teal), var(--teal-light));
+            background: linear-gradient(90deg, var(--teal), var(--teal-bright));
             transform: scaleX(0);
             transform-origin: left;
             transition: transform 0.35s ease;
         }
 
+        /* ghost watermark icon */
+        .svc-ghost {
+            position: absolute;
+            right: -28px;
+            bottom: -28px;
+            font-size: 150px;
+            color: rgba(26,171,138,0.05);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .svc-ghost .ic { stroke-width: 1; }
+
         .svc-card:hover {
-            border-color: rgba(26,171,138,0.25);
+            background:
+                linear-gradient(var(--dark-3), var(--dark-3)) padding-box,
+                linear-gradient(160deg, rgba(26,171,138,0.6), rgba(26,171,138,0.08) 50%, rgba(34,211,174,0.4)) border-box;
             transform: translateY(-6px);
-            box-shadow: 0 28px 64px rgba(0,0,0,0.35);
+            box-shadow: 0 28px 64px rgba(0,0,0,0.4), 0 0 40px rgba(26,171,138,0.07);
         }
 
         .svc-card:hover::after { transform: scaleX(1); }
+        .svc-card:hover .svc-ghost { color: rgba(26,171,138,0.1); transform: scale(1.08) rotate(-4deg); }
 
         .svc-icon-wrap {
             width: 68px;
             height: 68px;
-            background: rgba(26,171,138,0.1);
+            background: linear-gradient(135deg, rgba(26,171,138,0.18), rgba(26,171,138,0.05));
+            border: 1px solid rgba(26,171,138,0.25);
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 34px;
+            font-size: 32px;
+            color: var(--teal-light);
             margin-bottom: 28px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
         }
 
         .svc-label {
@@ -463,6 +684,8 @@
             display: flex;
             flex-direction: column;
             gap: 11px;
+            position: relative;
+            z-index: 1;
         }
 
         .svc-features li {
@@ -480,7 +703,7 @@
             background: rgba(26,171,138,0.15);
             border-radius: 50%;
             flex-shrink: 0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%231aab8a' d='M10 3L5 8.5 2 5.5 1 6.5l4 4 6-7z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%2322d3ae' d='M10 3L5 8.5 2 5.5 1 6.5l4 4 6-7z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: center;
             background-size: 10px;
@@ -489,7 +712,9 @@
         /* ─── WHY US ──────────────────────────────────────────────── */
         .why {
             padding: 110px 0;
-            background: var(--dark-2);
+            background:
+                radial-gradient(ellipse 40% 50% at 90% 50%, rgba(26,171,138,0.05), transparent),
+                var(--dark-2);
         }
 
         .why-grid {
@@ -504,6 +729,8 @@
             margin-bottom: 40px;
         }
 
+        .why-left .s-tag::before { display: none; }
+
         .feats {
             display: flex;
             flex-direction: column;
@@ -514,19 +741,27 @@
             display: flex;
             align-items: flex-start;
             gap: 18px;
+            padding: 14px;
+            margin: -14px;
+            border-radius: 16px;
+            transition: background 0.25s;
         }
+
+        .feat:hover { background: rgba(26,171,138,0.05); }
 
         .feat-icon {
             width: 52px;
             height: 52px;
-            background: rgba(26,171,138,0.1);
-            border: 1px solid rgba(26,171,138,0.2);
+            background: linear-gradient(135deg, rgba(26,171,138,0.16), rgba(26,171,138,0.04));
+            border: 1px solid rgba(26,171,138,0.25);
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 23px;
+            color: var(--teal-light);
             flex-shrink: 0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
         }
 
         .feat-body h4 {
@@ -541,12 +776,25 @@
             line-height: 1.7;
         }
 
-        /* Mock tracking card */
+        /* Mock tracking card — glass */
         .track-card {
-            background: var(--dark-3);
-            border: 1px solid rgba(255,255,255,0.09);
+            background: linear-gradient(160deg, rgba(17,30,53,0.9), rgba(11,21,39,0.95));
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 22px;
             padding: 32px;
+            box-shadow: 0 40px 90px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .track-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(26,171,138,0.14), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         .track-top {
@@ -556,16 +804,14 @@
             margin-bottom: 8px;
         }
 
-        .track-title {
-            font-weight: 700;
-            font-size: 17px;
-        }
+        .track-title { font-weight: 700; font-size: 17px; }
 
         .track-badge {
             display: flex;
             align-items: center;
             gap: 6px;
             background: rgba(26,171,138,0.12);
+            border: 1px solid rgba(26,171,138,0.25);
             color: var(--teal-light);
             padding: 5px 12px;
             border-radius: 100px;
@@ -577,7 +823,8 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--teal);
+            background: var(--teal-bright);
+            box-shadow: 0 0 8px var(--teal-bright);
             animation: blink 2s ease infinite;
         }
 
@@ -585,6 +832,8 @@
             font-size: 12px;
             color: rgba(255,255,255,0.35);
             margin-bottom: 22px;
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 0.5px;
         }
 
         .track-route {
@@ -604,14 +853,34 @@
             margin-bottom: 4px;
         }
 
-        .route-pt .city {
-            font-size: 20px;
-            font-weight: 700;
+        .route-pt .city { font-size: 20px; font-weight: 700; }
+
+        .route-line {
+            flex: 1.2;
+            position: relative;
+            height: 2px;
+            background-image: linear-gradient(90deg, var(--teal) 50%, transparent 50%);
+            background-size: 10px 2px;
+            animation: dashMove 1.2s linear infinite;
         }
 
-        .route-arrow { color: var(--teal); font-size: 22px; }
+        @keyframes dashMove {
+            from { background-position: 0 0; }
+            to { background-position: 10px 0; }
+        }
 
-        .prog-bar-wrap { margin-bottom: 22px; }
+        .route-line .ic {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
+            font-size: 22px;
+            color: var(--teal-light);
+            background: var(--dark-3);
+            padding: 0 4px;
+            box-sizing: content-box;
+        }
+
+        .prog-bar-wrap { margin-bottom: 22px; position: relative; }
 
         .prog-labels {
             display: flex;
@@ -631,18 +900,26 @@
         .prog-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--teal), var(--teal-light));
+            background: linear-gradient(90deg, var(--teal), var(--teal-bright));
             border-radius: 3px;
+            box-shadow: 0 0 12px rgba(34,211,174,0.5);
             transition: width 1.8s cubic-bezier(.4,0,.2,1);
+        }
+
+        .prog-truck {
+            position: absolute;
+            bottom: -7px;
+            left: 0%;
+            transform: translateX(-50%);
+            font-size: 19px;
+            color: var(--teal-bright);
+            filter: drop-shadow(0 0 6px rgba(34,211,174,0.6));
+            transition: left 1.8s cubic-bezier(.4,0,.2,1);
         }
 
         .stops { display: flex; flex-direction: column; gap: 14px; }
 
-        .stop {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
+        .stop { display: flex; align-items: center; gap: 14px; }
 
         .stop-dot {
             width: 10px;
@@ -652,10 +929,10 @@
             flex-shrink: 0;
         }
 
-        .stop-dot.done { background: var(--teal); }
+        .stop-dot.done { background: var(--teal); box-shadow: 0 0 8px rgba(26,171,138,0.5); }
         .stop-dot.now {
-            background: var(--teal);
-            box-shadow: 0 0 0 4px rgba(26,171,138,0.2);
+            background: var(--teal-bright);
+            box-shadow: 0 0 0 4px rgba(26,171,138,0.2), 0 0 12px var(--teal-bright);
             animation: blink 2s ease infinite;
         }
 
@@ -676,42 +953,60 @@
         /* ─── HOW IT WORKS ────────────────────────────────────────── */
         .how {
             padding: 110px 0;
-            background: var(--dark);
+            background:
+                radial-gradient(ellipse 50% 40% at 50% 100%, rgba(26,171,138,0.04), transparent),
+                var(--dark);
         }
 
         .steps-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 4px;
+            position: relative;
         }
 
         .step {
             padding: 36px 28px;
             text-align: center;
             position: relative;
+            border-radius: 18px;
+            transition: background 0.25s;
         }
 
+        .step:hover { background: rgba(255,255,255,0.025); }
+
         .step:not(:last-child)::after {
-            content: '→';
+            content: '';
             position: absolute;
-            right: -14px;
+            right: -16px;
             top: 50%;
+            width: 28px; height: 28px;
             transform: translateY(-50%);
-            color: rgba(26,171,138,0.3);
-            font-size: 24px;
             z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231aab8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' opacity='0.45'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M13 6l6 6-6 6'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
         }
 
         .step-num {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 72px;
             font-weight: 900;
-            color: rgba(26,171,138,0.1);
+            background: linear-gradient(180deg, rgba(26,171,138,0.22), rgba(26,171,138,0.02));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             line-height: 1;
             margin-bottom: 12px;
         }
 
-        .step-icon { font-size: 36px; margin-bottom: 14px; }
+        .step-icon {
+            font-size: 34px;
+            color: var(--teal-light);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: center;
+        }
 
         .step-title {
             font-size: 17px;
@@ -744,19 +1039,28 @@
             padding: 20px 18px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 13px;
             font-size: 15px;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.25s;
         }
 
         .ind-item:hover {
-            border-color: rgba(26,171,138,0.3);
+            border-color: rgba(26,171,138,0.35);
             color: var(--teal-light);
-            background: rgba(26,171,138,0.05);
+            background: rgba(26,171,138,0.06);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 32px rgba(0,0,0,0.3);
         }
 
-        .ind-em { font-size: 22px; }
+        .ind-em {
+            font-size: 21px;
+            color: var(--teal);
+            display: flex;
+            transition: color 0.25s;
+        }
+
+        .ind-item:hover .ind-em { color: var(--teal-bright); }
 
         /* ─── QUOTE CTA ───────────────────────────────────────────── */
         .quote-cta {
@@ -770,8 +1074,18 @@
             content: '';
             position: absolute;
             top: -100px; right: -100px;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(26,171,138,0.12) 0%, transparent 70%);
+            width: 560px; height: 560px;
+            background: radial-gradient(circle, rgba(26,171,138,0.16) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floaty 9s ease-in-out infinite;
+        }
+
+        .quote-cta::after {
+            content: '';
+            position: absolute;
+            bottom: -160px; left: -80px;
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(34,211,174,0.08) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -793,11 +1107,6 @@
             line-height: 1.1;
         }
 
-        .cta-left h2 em {
-            font-style: normal;
-            color: var(--teal);
-        }
-
         .cta-left p {
             font-size: 17px;
             color: rgba(255,255,255,0.65);
@@ -813,7 +1122,7 @@
         }
 
         .btn-cta-main {
-            background: var(--teal);
+            background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
             color: white;
             border: none;
             padding: 20px 44px;
@@ -824,12 +1133,12 @@
             transition: all 0.2s;
             white-space: nowrap;
             text-align: center;
+            box-shadow: 0 10px 36px rgba(26,171,138,0.3);
         }
 
         .btn-cta-main:hover {
-            background: var(--teal-dark);
             transform: translateY(-2px);
-            box-shadow: 0 16px 48px var(--teal-glow);
+            box-shadow: 0 16px 48px rgba(26,171,138,0.45);
         }
 
         .btn-cta-phone {
@@ -844,8 +1153,13 @@
             transition: all 0.2s;
             text-align: center;
             text-decoration: none;
-            display: block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
         }
+
+        .btn-cta-phone .ic { font-size: 17px; color: var(--teal-light); }
 
         .btn-cta-phone:hover {
             border-color: rgba(255,255,255,0.5);
@@ -857,6 +1171,16 @@
             background: var(--dark-2);
             border-top: 1px solid rgba(255,255,255,0.07);
             padding: 64px 0 32px;
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 50%;
+            transform: translateX(-50%);
+            width: 320px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--teal), transparent);
         }
 
         .foot-top {
@@ -889,10 +1213,10 @@
             text-decoration: none;
             font-size: 15px;
             margin-bottom: 13px;
-            transition: color 0.2s;
+            transition: color 0.2s, transform 0.2s;
         }
 
-        .foot-col a:hover { color: var(--teal); }
+        .foot-col a:hover { color: var(--teal-light); transform: translateX(3px); }
 
         .foot-bottom {
             border-top: 1px solid rgba(255,255,255,0.07);
@@ -933,8 +1257,10 @@
         }
 
         .modal {
-            background: var(--dark-2);
-            border: 1px solid rgba(255,255,255,0.1);
+            background:
+                linear-gradient(var(--dark-2), var(--dark-2)) padding-box,
+                linear-gradient(160deg, rgba(26,171,138,0.45), rgba(255,255,255,0.08) 40%, rgba(26,171,138,0.2)) border-box;
+            border: 1px solid transparent;
             border-radius: 24px;
             padding: 48px;
             width: 100%;
@@ -943,6 +1269,7 @@
             overflow-y: auto;
             transform: translateY(24px) scale(0.98);
             transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 60px 120px rgba(0,0,0,0.6);
         }
 
         .modal-bg.open .modal {
@@ -990,6 +1317,7 @@
         .modal-close:hover {
             background: rgba(255,255,255,0.14);
             color: white;
+            transform: rotate(90deg);
         }
 
         .form-grid {
@@ -1025,7 +1353,8 @@
             font-size: 15px;
             font-family: 'Inter', sans-serif;
             outline: none;
-            transition: border-color 0.2s, background 0.2s;
+            color-scheme: dark;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
         }
 
         .fg input::placeholder,
@@ -1036,6 +1365,7 @@
         .fg textarea:focus {
             border-color: var(--teal);
             background: rgba(26,171,138,0.05);
+            box-shadow: 0 0 0 3px rgba(26,171,138,0.12);
         }
 
         .fg select {
@@ -1056,7 +1386,7 @@
 
         .submit-btn {
             width: 100%;
-            background: var(--teal);
+            background: linear-gradient(135deg, var(--teal-light), var(--teal-dark));
             color: white;
             border: none;
             padding: 18px;
@@ -1072,8 +1402,7 @@
             gap: 8px;
         }
 
-        .submit-btn:hover {
-            background: var(--teal-dark);
+        .submit-btn:hover:not(:disabled) {
             transform: translateY(-1px);
             box-shadow: 0 10px 32px var(--teal-glow);
         }
@@ -1110,8 +1439,17 @@
             align-items: center;
             justify-content: center;
             font-size: 38px;
+            color: var(--teal-bright);
             margin: 0 auto 24px;
             background: rgba(26,171,138,0.08);
+            box-shadow: 0 0 0 0 rgba(26,171,138,0.4);
+            animation: ringPulse 2s ease infinite;
+        }
+
+        @keyframes ringPulse {
+            0% { box-shadow: 0 0 0 0 rgba(26,171,138,0.35); }
+            70% { box-shadow: 0 0 0 22px rgba(26,171,138,0); }
+            100% { box-shadow: 0 0 0 0 rgba(26,171,138,0); }
         }
 
         .success-state h3 {
@@ -1142,6 +1480,10 @@
         .reveal:nth-child(4) { transition-delay: 0.3s; }
 
         /* ─── RESPONSIVE ──────────────────────────────────────────── */
+        @media (max-width: 1100px) {
+            .hero-chips { display: none; }
+        }
+
         @media (max-width: 1024px) {
             .why-grid { grid-template-columns: 1fr; }
             .why-right { order: -1; }
@@ -1174,11 +1516,126 @@
 </head>
 <body>
 
+<div class="grain"></div>
+
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+        <symbol id="i-truck" viewBox="0 0 24 24">
+            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+            <path d="M15 18H9"/>
+            <path d="M19 18h2a1 1 0 0 0 1-1v-3.6a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14"/>
+            <circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>
+        </symbol>
+        <symbol id="i-ftl" viewBox="0 0 24 24">
+            <rect x="1.5" y="6" width="13" height="10" rx="1.5"/>
+            <path d="M14.5 9H18l3 3.5V16h-3.5"/>
+            <circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/>
+            <path d="M5 10h5"/>
+        </symbol>
+        <symbol id="i-ship" viewBox="0 0 24 24">
+            <path d="M2 20c1 .8 1.8 1 2.8 1 1.7 0 1.7-1.2 3.4-1.2s1.7 1.2 3.4 1.2 1.7-1.2 3.4-1.2 1.7 1.2 3.4 1.2c1 0 1.8-.2 2.8-1"/>
+            <path d="M4.5 17.5 3.5 13h17l-1 4.5"/>
+            <rect x="6" y="9" width="4" height="4"/>
+            <rect x="11" y="9" width="4" height="4"/>
+            <rect x="11" y="5" width="4" height="4"/>
+        </symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M2 12h20"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </symbol>
+        <symbol id="i-phone" viewBox="0 0 24 24">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2z"/>
+        </symbol>
+        <symbol id="i-clipboard" viewBox="0 0 24 24">
+            <rect x="5" y="4" width="14" height="18" rx="2"/>
+            <path d="M9 2.5h6V6H9z"/>
+            <path d="M9 11h6M9 15h6"/>
+        </symbol>
+        <symbol id="i-zap" viewBox="0 0 24 24">
+            <path d="M13 2 3 14h7l-1 8 11-12h-7l1-8z"/>
+        </symbol>
+        <symbol id="i-package" viewBox="0 0 24 24">
+            <path d="M21 8v8a2 2 0 0 1-1 1.7l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.7l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8z"/>
+            <path d="M3.3 7 12 12l8.7-5"/>
+            <path d="M12 22V12"/>
+        </symbol>
+        <symbol id="i-check-circle" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m8 12 3 3 5-6"/>
+        </symbol>
+        <symbol id="i-dollar" viewBox="0 0 24 24">
+            <path d="M12 2v20"/>
+            <path d="M17 6.5c0-1.7-2.2-3-5-3s-5 1.3-5 3 1.6 2.6 5 3.3 5 1.7 5 3.7-2.2 3-5 3-5-1.3-5-3"/>
+        </symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24">
+            <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+        </symbol>
+        <symbol id="i-headset" viewBox="0 0 24 24">
+            <path d="M4 15v-3a8 8 0 0 1 16 0v3"/>
+            <rect x="2.5" y="14" width="4" height="6.5" rx="2"/>
+            <rect x="17.5" y="14" width="4" height="6.5" rx="2"/>
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+            <path d="M12 2l8 3.5V12c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5.5z"/>
+            <path d="m8.5 12 2.5 2.5 4.5-5.5"/>
+        </symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3.2"/>
+            <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>
+        </symbol>
+        <symbol id="i-droplet" viewBox="0 0 24 24">
+            <path d="M12 2.7s6 6.3 6 11.3a6 6 0 0 1-12 0c0-5 6-11.3 6-11.3z"/>
+        </symbol>
+        <symbol id="i-car" viewBox="0 0 24 24">
+            <path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/>
+            <path d="M3 17v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/>
+            <circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
+        </symbol>
+        <symbol id="i-flask" viewBox="0 0 24 24">
+            <path d="M9 3h6"/>
+            <path d="M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3"/>
+            <path d="M7.5 15h9"/>
+        </symbol>
+        <symbol id="i-cart" viewBox="0 0 24 24">
+            <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
+            <path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/>
+        </symbol>
+        <symbol id="i-building" viewBox="0 0 24 24">
+            <rect x="4" y="3" width="16" height="18" rx="1"/>
+            <path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15M10 21v-3h4v3"/>
+        </symbol>
+        <symbol id="i-wheat" viewBox="0 0 24 24">
+            <path d="M12 22V8"/>
+            <path d="M12 8c0-3 2-5.5 5-5.5C17 5.5 15 8 12 8z"/>
+            <path d="M12 13c0-3-2-5.5-5-5.5 0 3 2 5.5 5 5.5z"/>
+            <path d="M12 18c0-3 2-5.5 5-5.5 0 3-2 5.5-5 5.5z"/>
+        </symbol>
+        <symbol id="i-pill" viewBox="0 0 24 24">
+            <path d="M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7z"/>
+            <path d="m8 15 7-7"/>
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+            <path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>
+        </symbol>
+        <symbol id="i-chevrons" viewBox="0 0 24 24">
+            <path d="m5 5 7 7-7 7"/><path d="m12 5 7 7-7 7"/>
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
+        </symbol>
+    </defs>
+</svg>
+
 <!-- ═══════════════════════════════ NAVBAR ══════════════════════════════ -->
 <nav id="nav">
     <div class="nav-wrap">
         <a class="logo" href="#">
-            <div class="logo-mark">AS</div>
+            <div class="logo-mark">
+                <svg><use href="#i-chevrons"/></svg>
+            </div>
             <div class="logo-words">
                 <span>ASSA</span><span> SHIPPING</span>
             </div>
@@ -1191,7 +1648,10 @@
             <a href="#cta">Contact</a>
         </div>
         <div class="nav-right">
-            <span class="nav-phone">📞 (833) 378-7838</span>
+            <a class="nav-phone" href="tel:8333787838">
+                <svg class="ic"><use href="#i-phone"/></svg>
+                (833) 378-7838
+            </a>
             <button class="btn-teal" onclick="openQuote()">Get a Quote</button>
         </div>
     </div>
@@ -1201,6 +1661,31 @@
 <section class="hero" id="home">
     <canvas id="hero-canvas"></canvas>
     <div class="hero-gradient"></div>
+
+    <div class="hero-chips" aria-hidden="true">
+        <div class="chip chip-1">
+            <div class="chip-ic"><svg class="ic"><use href="#i-check-circle"/></svg></div>
+            <div>
+                <div class="chip-title">Quote Delivered</div>
+                <div class="chip-sub">FTL · Houston → Atlanta · 42 min</div>
+            </div>
+        </div>
+        <div class="chip chip-2">
+            <div class="chip-ic"><svg class="ic"><use href="#i-ship"/></svg></div>
+            <div>
+                <div class="chip-title">Container Booked</div>
+                <div class="chip-sub">40ft HC · Shanghai → Houston</div>
+            </div>
+        </div>
+        <div class="chip chip-3">
+            <div class="chip-ic"><svg class="ic"><use href="#i-truck"/></svg></div>
+            <div>
+                <div class="chip-title">Out for Delivery</div>
+                <div class="chip-sub">LTL · 6 pallets · Chicago, IL</div>
+            </div>
+        </div>
+    </div>
+
     <div class="hero-content">
         <div class="hero-eyebrow">
             <span class="dot"></span>
@@ -1208,12 +1693,12 @@
         </div>
         <h1>
             Freight That<br>
-            <em>Actually Moves.</em>
+            <span class="grad-text">Actually Moves.</span>
         </h1>
         <div class="hero-tags">
-            <span class="hero-tag">🚛 LTL Freight</span>
-            <span class="hero-tag">🚚 FTL Freight</span>
-            <span class="hero-tag">🚢 International Containers</span>
+            <span class="hero-tag"><svg class="ic"><use href="#i-truck"/></svg> LTL Freight</span>
+            <span class="hero-tag"><svg class="ic"><use href="#i-ftl"/></svg> FTL Freight</span>
+            <span class="hero-tag"><svg class="ic"><use href="#i-ship"/></svg> International Containers</span>
         </div>
         <p class="hero-sub">
             Enterprise-grade logistics without the enterprise headache. Backed by ASSA Oil's established carrier network — competitive rates, real-time visibility, and a team that picks up the phone.
@@ -1227,6 +1712,8 @@
             </a>
         </div>
     </div>
+
+    <div class="scroll-hint" aria-hidden="true"></div>
 </section>
 
 <!-- ═══════════════════════════════ TICKER ══════════════════════════════ -->
@@ -1273,12 +1760,13 @@
     <div class="container">
         <div class="section-header">
             <div class="s-tag">What We Move</div>
-            <h2 class="s-title">Freight Solutions for Every Load</h2>
+            <h2 class="s-title">Freight Solutions for <span class="grad-text">Every Load</span></h2>
             <p class="s-sub">From a single pallet to a full container crossing oceans — we have the network, the rates, and the expertise.</p>
         </div>
         <div class="services-grid">
             <div class="svc-card reveal">
-                <div class="svc-icon-wrap">🚛</div>
+                <div class="svc-ghost"><svg class="ic"><use href="#i-truck"/></svg></div>
+                <div class="svc-icon-wrap"><svg class="ic"><use href="#i-truck"/></svg></div>
                 <div class="svc-label">Less Than Truckload</div>
                 <h3 class="svc-title">LTL Freight</h3>
                 <p class="svc-desc">Don't pay for empty space. We consolidate your freight with other shipments — maximizing efficiency and minimizing your cost per hundredweight.</p>
@@ -1291,7 +1779,8 @@
                 </ul>
             </div>
             <div class="svc-card reveal">
-                <div class="svc-icon-wrap">🚚</div>
+                <div class="svc-ghost"><svg class="ic"><use href="#i-ftl"/></svg></div>
+                <div class="svc-icon-wrap"><svg class="ic"><use href="#i-ftl"/></svg></div>
                 <div class="svc-label">Full Truckload</div>
                 <h3 class="svc-title">FTL Freight</h3>
                 <p class="svc-desc">Your freight. Your truck. Dedicated FTL means faster transit, less handling, lower claim risk, and total control over your supply chain timeline.</p>
@@ -1304,7 +1793,8 @@
                 </ul>
             </div>
             <div class="svc-card reveal">
-                <div class="svc-icon-wrap">🚢</div>
+                <div class="svc-ghost"><svg class="ic"><use href="#i-ship"/></svg></div>
+                <div class="svc-icon-wrap"><svg class="ic"><use href="#i-ship"/></svg></div>
                 <div class="svc-label">Ocean & Air Freight</div>
                 <h3 class="svc-title">International</h3>
                 <p class="svc-desc">Move goods across borders without the headaches. Our global freight team handles customs documentation, compliance, and carrier coordination end-to-end.</p>
@@ -1327,33 +1817,33 @@
             <div class="why-left">
                 <div class="section-header">
                     <div class="s-tag">Why ASSA Shipping</div>
-                    <h2 class="s-title">The Logistics Power of an Oil Giant</h2>
+                    <h2 class="s-title">The Logistics Power of an <span class="grad-text">Oil Giant</span></h2>
                     <p class="s-sub" style="text-align:left;">Backed by ASSA Oil's established supply chain infrastructure, carrier relationships, and industry-wide credibility.</p>
                 </div>
                 <div class="feats">
                     <div class="feat reveal">
-                        <div class="feat-icon">💰</div>
+                        <div class="feat-icon"><svg class="ic"><use href="#i-dollar"/></svg></div>
                         <div class="feat-body">
                             <h4>Rates That Actually Compete</h4>
                             <p>ASSA's freight volume gives us leverage most brokers don't have. We pass those savings directly to you — not broker margins.</p>
                         </div>
                     </div>
                     <div class="feat reveal">
-                        <div class="feat-icon">📍</div>
+                        <div class="feat-icon"><svg class="ic"><use href="#i-pin"/></svg></div>
                         <div class="feat-body">
                             <h4>Live Tracking & Full Visibility</h4>
                             <p>Real-time status from pickup to delivery. No chasing down drivers — know exactly where your freight is, always.</p>
                         </div>
                     </div>
                     <div class="feat reveal">
-                        <div class="feat-icon">🤝</div>
+                        <div class="feat-icon"><svg class="ic"><use href="#i-headset"/></svg></div>
                         <div class="feat-body">
                             <h4>Dedicated Account Manager</h4>
                             <p>A real person who knows your business, your lanes, and your freight profile. Not a ticket queue — a relationship.</p>
                         </div>
                     </div>
                     <div class="feat reveal">
-                        <div class="feat-icon">🌐</div>
+                        <div class="feat-icon"><svg class="ic"><use href="#i-shield"/></svg></div>
                         <div class="feat-body">
                             <h4>Customs & Compliance Expertise</h4>
                             <p>International freight is complex. Our team handles ISF filings, HAZMAT certifications, and all the paperwork in between.</p>
@@ -1375,8 +1865,10 @@
                             <div class="lbl">Origin</div>
                             <div class="city">Houston, TX</div>
                         </div>
-                        <div class="route-arrow">→</div>
-                        <div class="route-pt">
+                        <div class="route-line">
+                            <svg class="ic"><use href="#i-truck"/></svg>
+                        </div>
+                        <div class="route-pt" style="text-align:right">
                             <div class="lbl">Destination</div>
                             <div class="city">Chicago, IL</div>
                         </div>
@@ -1388,6 +1880,9 @@
                         </div>
                         <div class="prog-bar">
                             <div class="prog-fill" id="progFill"></div>
+                        </div>
+                        <div class="prog-truck" id="progTruck">
+                            <svg class="ic"><use href="#i-truck"/></svg>
                         </div>
                     </div>
                     <div class="stops">
@@ -1435,31 +1930,31 @@
     <div class="container">
         <div class="section-header">
             <div class="s-tag">The Process</div>
-            <h2 class="s-title">Freight Made Simple</h2>
+            <h2 class="s-title">Freight Made <span class="grad-text">Simple</span></h2>
             <p class="s-sub">From quote request to proof of delivery — streamlined every step of the way.</p>
         </div>
         <div class="steps-grid">
             <div class="step reveal">
                 <div class="step-num">01</div>
-                <div class="step-icon">📋</div>
+                <div class="step-icon"><svg class="ic"><use href="#i-clipboard"/></svg></div>
                 <h3 class="step-title">Submit Your Details</h3>
                 <p class="step-desc">Fill out our quick quote form — origin, destination, freight type, weight, and timeline. Takes under 2 minutes.</p>
             </div>
             <div class="step reveal">
                 <div class="step-num">02</div>
-                <div class="step-icon">⚡</div>
+                <div class="step-icon"><svg class="ic"><use href="#i-zap"/></svg></div>
                 <h3 class="step-title">Receive Your Quote</h3>
                 <p class="step-desc">Our team reviews your load and delivers a competitive rate — usually within the hour, often faster.</p>
             </div>
             <div class="step reveal">
                 <div class="step-num">03</div>
-                <div class="step-icon">📦</div>
+                <div class="step-icon"><svg class="ic"><use href="#i-package"/></svg></div>
                 <h3 class="step-title">We Book the Load</h3>
                 <p class="step-desc">Approve the rate and we handle carrier dispatch, BOL documentation, and pickup coordination.</p>
             </div>
             <div class="step reveal">
                 <div class="step-num">04</div>
-                <div class="step-icon">✅</div>
+                <div class="step-icon"><svg class="ic"><use href="#i-check-circle"/></svg></div>
                 <h3 class="step-title">Track to Delivery</h3>
                 <p class="step-desc">Real-time updates from pickup to POD. Your account manager stays on it so you don't have to.</p>
             </div>
@@ -1472,18 +1967,18 @@
     <div class="container">
         <div class="section-header">
             <div class="s-tag">Who We Serve</div>
-            <h2 class="s-title">Built for Industry</h2>
+            <h2 class="s-title">Built for <span class="grad-text">Industry</span></h2>
             <p class="s-sub">From chemicals to consumer goods — we move what your business depends on.</p>
         </div>
         <div class="ind-grid">
-            <div class="ind-item reveal"><span class="ind-em">⚙️</span> Manufacturing</div>
-            <div class="ind-item reveal"><span class="ind-em">🛢️</span> Oil & Energy</div>
-            <div class="ind-item reveal"><span class="ind-em">🚗</span> Automotive</div>
-            <div class="ind-item reveal"><span class="ind-em">🧪</span> Chemical & Industrial</div>
-            <div class="ind-item reveal"><span class="ind-em">🛒</span> Retail & E-Commerce</div>
-            <div class="ind-item reveal"><span class="ind-em">🏗️</span> Construction</div>
-            <div class="ind-item reveal"><span class="ind-em">🌾</span> Agriculture</div>
-            <div class="ind-item reveal"><span class="ind-em">💊</span> Pharmaceutical</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-gear"/></svg></span> Manufacturing</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-droplet"/></svg></span> Oil & Energy</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-car"/></svg></span> Automotive</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-flask"/></svg></span> Chemical & Industrial</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-cart"/></svg></span> Retail & E-Commerce</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-building"/></svg></span> Construction</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-wheat"/></svg></span> Agriculture</div>
+            <div class="ind-item reveal"><span class="ind-em"><svg class="ic"><use href="#i-pill"/></svg></span> Pharmaceutical</div>
         </div>
     </div>
 </section>
@@ -1493,12 +1988,15 @@
     <div class="container">
         <div class="cta-inner">
             <div class="cta-left">
-                <h2>Ready to Move<br><em>Your Freight?</em></h2>
+                <h2>Ready to Move<br><span class="grad-text">Your Freight?</span></h2>
                 <p>Get a competitive quote in under an hour. No commitments, no runaround — just straight answers and rates that make sense for your business.</p>
             </div>
             <div class="cta-right">
                 <button class="btn-cta-main" onclick="openQuote()">Get a Free Quote →</button>
-                <a href="tel:8333787838" class="btn-cta-phone">📞 (833) 378-7838</a>
+                <a href="tel:8333787838" class="btn-cta-phone">
+                    <svg class="ic"><use href="#i-phone"/></svg>
+                    (833) 378-7838
+                </a>
             </div>
         </div>
     </div>
@@ -1510,7 +2008,9 @@
         <div class="foot-top">
             <div class="foot-brand">
                 <a class="logo" href="#">
-                    <div class="logo-mark">AS</div>
+                    <div class="logo-mark">
+                        <svg><use href="#i-chevrons"/></svg>
+                    </div>
                     <div class="logo-words">
                         <span>ASSA</span><span> SHIPPING</span>
                     </div>
@@ -1628,7 +2128,7 @@
             <div class="success-ring">✓</div>
             <h3>Quote Request Received!</h3>
             <p>
-                Thanks! Our freight team will review your details and get back to you at <strong style="color:var(--teal)">within 1 hour</strong> with a competitive quote.
+                Thanks! Our freight team will review your details and get back to you <strong style="color:var(--teal)">within 1 hour</strong> with a competitive quote.
             </p>
             <button class="btn-hero-primary" onclick="closeQuote()">Close &nbsp;→</button>
         </div>
@@ -1637,54 +2137,106 @@
 
 <!-- ═══════════════════════════════ SCRIPTS ══════════════════════════════ -->
 <script>
-// ── HERO CANVAS (shipping network animation) ──────────────────────────────
+// ── HERO CANVAS: animated shipping routes + drifting particles ───────────
 (function () {
     const canvas = document.getElementById('hero-canvas');
     const ctx = canvas.getContext('2d');
+    let W, H;
 
     function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = canvas.parentElement.offsetHeight;
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = canvas.parentElement.offsetHeight;
+        buildRoutes();
     }
+
+    // drifting particles for depth
+    const N = 60;
+    let nodes = [];
+    function buildNodes() {
+        nodes = Array.from({ length: N }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            r: Math.random() * 1.8 + 0.7,
+            a: Math.random() * 0.45 + 0.12,
+        }));
+    }
+    buildNodes();
+
+    // shipping routes: arcs with pulses traveling along them
+    let routes = [];
+    function buildRoutes() {
+        const defs = [
+            { x1: 0.05, y1: 0.80, x2: 0.55, y2: 0.30, lift: 0.30 },
+            { x1: 0.15, y1: 0.95, x2: 0.90, y2: 0.55, lift: 0.38 },
+            { x1: 0.40, y1: 0.90, x2: 0.95, y2: 0.20, lift: 0.34 },
+            { x1: 0.55, y1: 0.75, x2: 0.98, y2: 0.85, lift: 0.22 },
+            { x1: 0.30, y1: 0.15, x2: 0.92, y2: 0.40, lift: 0.20 },
+            { x1: 0.60, y1: 0.10, x2: 0.10, y2: 0.45, lift: 0.25 },
+        ];
+        routes = defs.map((d, i) => {
+            const x1 = d.x1 * W, y1 = d.y1 * H;
+            const x2 = d.x2 * W, y2 = d.y2 * H;
+            // control point lifted above the midpoint for an arc
+            const cx = (x1 + x2) / 2 + (y1 - y2) * 0.15;
+            const cy = (y1 + y2) / 2 - H * d.lift * 0.5;
+            return {
+                x1, y1, x2, y2, cx, cy,
+                t: Math.random(),                    // pulse position 0..1
+                speed: 0.0011 + Math.random() * 0.0013,
+                phase: i * 0.9,
+            };
+        });
+    }
+
+    function qPoint(r, t) {
+        // point on quadratic bezier at t
+        const mt = 1 - t;
+        return {
+            x: mt * mt * r.x1 + 2 * mt * t * r.cx + t * t * r.x2,
+            y: mt * mt * r.y1 + 2 * mt * t * r.cy + t * t * r.y2,
+        };
+    }
+
     resize();
     window.addEventListener('resize', resize);
 
-    const N = 70;
-    const nodes = Array.from({ length: N }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        r: Math.random() * 1.8 + 0.8,
-        a: Math.random() * 0.5 + 0.15,
-    }));
-
-    function frame() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function frame(time) {
+        ctx.clearRect(0, 0, W, H);
 
         // background gradient
-        const g = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        const g = ctx.createLinearGradient(0, 0, W, H);
         g.addColorStop(0, '#060d1f');
         g.addColorStop(0.6, '#080f22');
         g.addColorStop(1, '#061520');
         ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, W, H);
 
+        // faint dot grid (map feel)
+        ctx.fillStyle = 'rgba(255,255,255,0.025)';
+        const gap = 44;
+        for (let gx = gap / 2; gx < W; gx += gap) {
+            for (let gy = gap / 2; gy < H; gy += gap) {
+                ctx.fillRect(gx, gy, 1.5, 1.5);
+            }
+        }
+
+        // particles + connections
         nodes.forEach(n => {
-            n.x += n.vx;
-            n.y += n.vy;
-            if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
-            if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+            n.x += n.vx; n.y += n.vy;
+            if (n.x < 0 || n.x > W) n.vx *= -1;
+            if (n.y < 0 || n.y > H) n.vy *= -1;
         });
 
         for (let i = 0; i < nodes.length; i++) {
             for (let j = i + 1; j < nodes.length; j++) {
                 const dx = nodes[i].x - nodes[j].x;
                 const dy = nodes[i].y - nodes[j].y;
-                const d  = Math.hypot(dx, dy);
-                if (d < 160) {
-                    ctx.strokeStyle = `rgba(26,171,138,${(1 - d / 160) * 0.14})`;
-                    ctx.lineWidth = 0.8;
+                const d = Math.hypot(dx, dy);
+                if (d < 150) {
+                    ctx.strokeStyle = `rgba(26,171,138,${(1 - d / 150) * 0.10})`;
+                    ctx.lineWidth = 0.7;
                     ctx.beginPath();
                     ctx.moveTo(nodes[i].x, nodes[i].y);
                     ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -1700,9 +2252,58 @@
             ctx.fill();
         });
 
+        // shipping route arcs
+        routes.forEach(r => {
+            // arc path — soft glow
+            ctx.beginPath();
+            ctx.moveTo(r.x1, r.y1);
+            ctx.quadraticCurveTo(r.cx, r.cy, r.x2, r.y2);
+            ctx.strokeStyle = 'rgba(26,171,138,0.13)';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([6, 7]);
+            ctx.lineDashOffset = -(time * 0.012);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // endpoint hubs
+            [[r.x1, r.y1], [r.x2, r.y2]].forEach(([hx, hy]) => {
+                ctx.beginPath();
+                ctx.arc(hx, hy, 3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(34,211,174,0.5)';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(hx, hy, 7, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(34,211,174,0.16)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // traveling pulse with trail
+            r.t += r.speed;
+            if (r.t > 1) r.t = 0;
+            for (let k = 0; k < 5; k++) {
+                const tt = r.t - k * 0.012;
+                if (tt < 0) continue;
+                const p = qPoint(r, tt);
+                const alpha = 0.65 * (1 - k / 5);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2.6 - k * 0.4, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(52,245,204,${alpha})`;
+                ctx.fill();
+            }
+            const head = qPoint(r, r.t);
+            ctx.beginPath();
+            ctx.arc(head.x, head.y, 5.5, 0, Math.PI * 2);
+            const glow = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 9);
+            glow.addColorStop(0, 'rgba(52,245,204,0.55)');
+            glow.addColorStop(1, 'rgba(52,245,204,0)');
+            ctx.fillStyle = glow;
+            ctx.fill();
+        });
+
         requestAnimationFrame(frame);
     }
-    frame();
+    requestAnimationFrame(frame);
 })();
 
 // ── NAVBAR SCROLL ─────────────────────────────────────────────────────────
@@ -1721,6 +2322,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 const trackObs = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
         document.getElementById('progFill').style.width = '65%';
+        document.getElementById('progTruck').style.left = '65%';
         trackObs.disconnect();
     }
 }, { threshold: 0.4 });
